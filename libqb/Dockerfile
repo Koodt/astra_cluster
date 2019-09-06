@@ -8,9 +8,9 @@ RUN tar Jxvf libqb-0.17.2.tar.xz
 WORKDIR /tmp/libqb-0.17.2
 
 RUN ./autogen.sh \
-    && ./configure \
-    && make -j `grep -c ^processor /proc/cpuinfo` \
+    && ./configure --prefix=/opt/cluster \
+    && make -j`grep -c ^processor /proc/cpuinfo` \
     && mkdir -pv /tmp/build \
     && make install DESTDIR=/tmp/build
 
-RUN fpm -s dir -t deb -n libqb -v 0.17.2 -C /tmp/build -p /srv
+RUN fpm -s dir -t deb -n cluster-libqb -v 0.17.2 -C /tmp/build -p /srv
