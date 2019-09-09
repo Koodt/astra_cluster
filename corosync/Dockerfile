@@ -1,11 +1,11 @@
-FROM astralibqb
+FROM compose_prereq
 
 WORKDIR /tmp
 
 RUN wget --no-check-certificate https://github.com/corosync/corosync/releases/download/v2.4.5/corosync-2.4.5.tar.gz
 RUN tar zxvf corosync-2.4.5.tar.gz
 
-RUN dpkg -i /srv/*
+RUN dpkg -i /exhaust/*
 
 WORKDIR /tmp/corosync-2.4.5
 

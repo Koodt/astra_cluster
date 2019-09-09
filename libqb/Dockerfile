@@ -1,4 +1,4 @@
-FROM astraprereq
+FROM compose_prereq
 
 WORKDIR /tmp
 
