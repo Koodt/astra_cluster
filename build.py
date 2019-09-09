@@ -50,9 +50,27 @@ cglueCommand = """sh -c 'wget --no-check-certificate https://github.com/ClusterL
                      cp /tmp/deb/* /exhaust/
                   '"""
 
+
+
+ragentsCommand = """sh -c 'wget --no-check-certificate https://github.com/ClusterLabs/resource-agents/archive/v3.9.7.tar.gz &&
+                     tar zxvf v3.9.7.tar.gz && cd /tmp/resource-agents-3.9.7 &&
+                     dpkg -i /exhaust/* && ./autogen.sh &&
+                     PATH="/opt/cluster/bin:$PATH" PKG_CONFIG_PATH="/opt/cluster/lib/pkgconfig" ./configure \
+                     --prefix=/opt/cluster \
+                     --bindir=/opt/cluster/bin \
+                     --libdir=/opt/cluster/lib \
+                     --sysconfdir=/etc \
+                     --localstatedir=/var \
+                     --with-ocf-root=/opt/cluster/lib/ocf &&
+                     make -j`grep -c ^processor /proc/cpuinfo` &&
+                     mkdir -pv /tmp/build /tmp/deb && make install DESTDIR=/tmp/build &&
+                     fpm -s dir -t deb -n cluster-resource-agents -v 3.9.7 -C /tmp/build -p /tmp/deb -d cluster-libqb -d cluster-corosync cluster-cluster-glue &&
+                     cp /tmp/deb/* /exhaust/
+                  '"""
+
 def main():
     buildImage('./prereq/', 'prereq')
-    for command in libqbCommand, corosyncCommand, cglueCommand:
+    for command in libqbCommand, corosyncCommand, cglueCommand, ragentsCommand:
         runContainer(command)
 
 if __name__ == "__main__":
