@@ -10,3 +10,6 @@ astraglue
 astraagents
 astrapacemaker
 astracrm
+
+# Run build.py
+I fixing it now
