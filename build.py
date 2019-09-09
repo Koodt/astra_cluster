@@ -34,9 +34,25 @@ corosyncCommand = """sh -c 'wget --no-check-certificate https://github.com/coros
                      cp /tmp/deb/* /exhaust/
                   '"""
 
+cglueCommand = """sh -c 'wget --no-check-certificate https://github.com/ClusterLabs/cluster-glue/archive/glue-1.0.12.tar.gz &&
+                     tar zxvf glue-1.0.12.tar.gz && cd /tmp/cluster-glue-glue-1.0.12 &&
+                     dpkg -i /exhaust/* && ./autogen.sh &&
+                     PATH="/opt/cluster/bin:$PATH" PKG_CONFIG_PATH="/opt/cluster/lib/pkgconfig" ./configure \
+                     --enable-fatal-warnings=no \
+                     --prefix=/opt/cluster \
+                     --bindir=/opt/cluster/bin \
+                     --libdir=/opt/cluster/lib \
+                     --sysconfdir=/etc \
+                     --localstatedir=/var &&
+                     make -j`grep -c ^processor /proc/cpuinfo` &&
+                     mkdir -pv /tmp/build /tmp/deb && make install DESTDIR=/tmp/build &&
+                     fpm -s dir -t deb -n cluster-cluster-glue -v 1.0.12 -C /tmp/build -p /tmp/deb -d cluster-libqb -d cluster-corosync &&
+                     cp /tmp/deb/* /exhaust/
+                  '"""
+
 def main():
     buildImage('./prereq/', 'prereq')
-    for command in libqbCommand, corosyncCommand:
+    for command in libqbCommand, corosyncCommand, cglueCommand:
         runContainer(command)
 
 if __name__ == "__main__":
