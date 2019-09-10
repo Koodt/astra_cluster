@@ -121,6 +121,12 @@ crmCommand = """sh -c 'wget --no-check-certificate https://github.com/ClusterLab
                      cp /tmp/deb/* /exhaust/
                   '"""
 
+pythonCommand = """sh -c 'curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py &&
+                     python get-pip.py && mkdir -pv wheels &&
+                     pip wheel --wheel-dir wheels/ pip wheel parallel-ssh &&
+                     pip install --find-links wheel pip wheel parallel_ssh &&
+                  '"""
+
 def main():
     buildImage('./prereq/', 'prereq')
     for command in libqbCommand, corosyncCommand, cglueCommand, ragentsCommand, pacemakerCommand, crmCommand:
