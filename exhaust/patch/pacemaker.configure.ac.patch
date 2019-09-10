@@ -1,0 +1,18 @@
+--- configure.ac_old	2019-09-10 09:35:11.944333836 +0000
++++ configure.ac	2019-09-10 09:36:02.109168776 +0000
+@@ -1196,13 +1196,13 @@
+ 
+ AC_DEFINE_UNQUOTED(UUID_FILE,"$localstatedir/lib/heartbeat/hb_uuid", Location of Heartbeat's UUID file)
+ 
+-OCF_ROOT_DIR=`try_extract_header_define $GLUE_HEADER OCF_ROOT_DIR /usr/lib/ocf`
++OCF_ROOT_DIR=`try_extract_header_define $GLUE_HEADER OCF_ROOT_DIR $libdir/ocf`
+ if test "X$OCF_ROOT_DIR" = X; then
+   AC_MSG_ERROR(Could not locate OCF directory)
+ fi
+ AC_SUBST(OCF_ROOT_DIR)
+ 
+-OCF_RA_DIR=`try_extract_header_define $GLUE_HEADER OCF_RA_DIR $OCF_ROOT_DIR/resource.d`
++OCF_RA_DIR=`try_extract_header_define $GLUE_HEADER OCF_RA_DIR $OCF_ROOT_DIR/resource.d/`
+ AC_DEFINE_UNQUOTED(OCF_RA_DIR,"$OCF_RA_DIR", Location for OCF RAs)
+ AC_SUBST(OCF_RA_DIR)
+ 

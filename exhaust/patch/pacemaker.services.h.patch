@@ -1,0 +1,11 @@
+--- ./include/crm/services.h_old	2019-09-10 09:48:05.412346548 +0000
++++ ./include/crm/services.h	2019-09-10 09:48:29.508702364 +0000
+@@ -36,7 +36,7 @@
+ #  include <sys/types.h>
+ 
+ #  ifndef OCF_ROOT_DIR
+-#    define OCF_ROOT_DIR "/usr/lib/ocf"
++#    define OCF_ROOT_DIR "/opt/cluster/lib/ocf"
+ #  endif
+ 
+ #  ifndef LSB_ROOT_DIR
