@@ -33,7 +33,7 @@ corosyncCommand = """sh -c 'wget --no-check-certificate https://github.com/coros
                      mkdir -pv /tmp/build /tmp/deb && make install DESTDIR=/tmp/build &&
                      fpm -s dir -t deb -n cluster-corosync -v 2.4.5 -C /tmp/build \
                      --before-install /exhaust/scripts/corosync/preinst \
-                     --before-remove /exhaust/scripts/corosync/prerm
+                     --before-remove /exhaust/scripts/corosync/prerm \
                      --after-install /exhaust/scripts/corosync/postinst \
                      --after-remove /exhaust/scripts/corosync/postrm \
                      --deb-after-purge /exhaust/scripts/corosync/postrm \
@@ -92,7 +92,7 @@ pacemakerCommand = """sh -c 'wget --no-check-certificate https://github.com/Clus
                      make -j`grep -c ^processor /proc/cpuinfo` &&
                      mkdir -pv /tmp/build /tmp/deb && make install DESTDIR=/tmp/build &&
                      fpm -s dir -t deb -n cluster-pacemaker -v 1.1.21 -C /tmp/build \
-                     --before-remove /exhaust/scripts/pacemaker/prerm
+                     --before-remove /exhaust/scripts/pacemaker/prerm \
                      --after-install /exhaust/scripts/pacemaker/postinst \
                      -p /tmp/deb -d cluster-libqb -d cluster-corosync \
                      -d cluster-cluster-glue -d cluster-resource-agents &&
@@ -124,9 +124,9 @@ crmCommand = """sh -c 'wget --no-check-certificate https://github.com/ClusterLab
 
 def main():
     buildImage('./prereq/', 'prereq')
-    #for command in crmCommand:
-        #runContainer(command)
-    runContainer(crmCommand)
+    for command in libqbCommand, corosyncCommand, cglueCommand, ragentsCommand, pacemakerCommand, crmCommand:
+        runContainer(command)
+    #runContainer(crmCommand)
 
 if __name__ == "__main__":
     client = docker.from_env()
