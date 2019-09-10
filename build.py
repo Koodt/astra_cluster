@@ -45,7 +45,7 @@ cglueCommand = """sh -c 'wget --no-check-certificate https://github.com/ClusterL
                      --libdir=/opt/cluster/lib \
                      --sysconfdir=/etc \
                      --localstatedir=/var \
-                     --with-ocf-root=/opt/cluster/lib &&
+                     --with-ocf-root=/opt/cluster/lib/ocf &&
                      make -j`grep -c ^processor /proc/cpuinfo` &&
                      mkdir -pv /tmp/build /tmp/deb && make install DESTDIR=/tmp/build &&
                      fpm -s dir -t deb -n cluster-cluster-glue -v 1.0.12 -C /tmp/build -p /tmp/deb -d cluster-libqb -d cluster-corosync &&
@@ -61,7 +61,7 @@ ragentsCommand = """sh -c 'wget --no-check-certificate https://github.com/Cluste
                      --libdir=/opt/cluster/lib \
                      --sysconfdir=/etc \
                      --localstatedir=/var \
-                     --with-ocf-root=/opt/cluster/lib &&
+                     --with-ocf-root=/opt/cluster/lib/ocf &&
                      make -j`grep -c ^processor /proc/cpuinfo` &&
                      mkdir -pv /tmp/build /tmp/deb && make install DESTDIR=/tmp/build &&
                      fpm -s dir -t deb -n cluster-resource-agents -v 3.9.7 -C /tmp/build -p /tmp/deb -d cluster-libqb -d cluster-corosync -d cluster-cluster-glue &&
@@ -70,24 +70,27 @@ ragentsCommand = """sh -c 'wget --no-check-certificate https://github.com/Cluste
 
 pacemakerCommand = """sh -c 'wget --no-check-certificate https://github.com/ClusterLabs/pacemaker/archive/Pacemaker-1.1.21.tar.gz &&
                      tar zxvf Pacemaker-1.1.21.tar.gz && cd /tmp/pacemaker-Pacemaker-1.1.21 &&
-                     patch configure.ac < /eaxhaust/configure.patch &&
+                     patch ./configure.ac < /exhaust/patch/pacemaker.configure.ac.patch &&
+                     patch ./include/crm/services.h < /exhaust/patch/pacemaker.services.h.patch &&
                      dpkg -i /exhaust/*.deb && ./autogen.sh &&
                      PATH="/opt/cluster/bin:$PATH" \
                      PKG_CONFIG_PATH="/opt/cluster/lib/pkgconfig" ./configure \
                      --prefix=/opt/cluster \
                      --bindir=/opt/cluster/bin \
                      --libdir=/opt/cluster/lib \
+                     --libexecdir=/opt/cluster/libexec \
                      --sysconfdir=/etc \
                      --localstatedir=/var &&
                      make -j`grep -c ^processor /proc/cpuinfo` &&
                      mkdir -pv /tmp/build /tmp/deb && make install DESTDIR=/tmp/build &&
-                     fpm -s dir -t deb -n cluster-resource-agents -v 3.9.7 -C /tmp/build -p /tmp/deb -d cluster-libqb -d cluster-corosync -d cluster-cluster-glue &&
+                     fpm -s dir -t deb -n cluster-pacemaker -v 1.1.21 -C /tmp/build -p /tmp/deb -d cluster-libqb \
+                     -d cluster-corosync -d cluster-cluster-glue -d cluster-resource-agents &&
                      cp /tmp/deb/* /exhaust/
                   '"""
 
 def main():
     buildImage('./prereq/', 'prereq')
-    for command in libqbCommand, corosyncCommand, cglueCommand, ragentsCommand:
+    for command in libqbCommand, corosyncCommand, cglueCommand, ragentsCommand, pacemakerCommand:
         runContainer(command)
 
 if __name__ == "__main__":
