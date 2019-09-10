@@ -1,0 +1,4 @@
+#!/bin/sh -e
+
+### add crmsh link to python dir
+rm /usr/lib/python2.7/dist-packages/crmsh
