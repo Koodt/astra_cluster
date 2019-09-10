@@ -62,7 +62,7 @@ if which pycompile >/dev/null 2>&1; then
 fi
 
 if which pycompile >/dev/null 2>&1; then
-	pycompile -p pacemaker /usr/lib/pacemaker -V 2.5-
+	pycompile -p pacemaker /opt/cluster/lib/pacemaker -V 2.5-
 fi
 
 # End automatically added section
