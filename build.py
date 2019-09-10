@@ -88,9 +88,32 @@ pacemakerCommand = """sh -c 'wget --no-check-certificate https://github.com/Clus
                      cp /tmp/deb/* /exhaust/
                   '"""
 
+crmCommand = """sh -c 'wget --no-check-certificate https://github.com/ClusterLabs/crmsh/archive/2.1.9.tar.gz &&
+                     tar zxvf 2.1.9.tar.gz && cd /tmp/crmsh-2.1.9 &&
+                     dpkg -i /exhaust/*.deb && ./autogen.sh &&
+                     PATH="/opt/cluster/bin:$PATH" \
+                     PKG_CONFIG_PATH="/opt/cluster/lib/pkgconfig" ./configure \
+                     --prefix=/opt/cluster \
+                     --bindir=/opt/cluster/bin \
+                     --libdir=/usr/lib \
+                     --libexecdir=/opt/cluster/libexec \
+                     --sysconfdir=/etc \
+                     --localstatedir=/var &&
+                     make -j`grep -c ^processor /proc/cpuinfo` &&
+                     mkdir -pv /tmp/build /tmp/deb && make install DESTDIR=/tmp/build &&
+                     fpm -s dir -t deb -n cluster-crmsh -v 2.1.9 -C /tmp/build \
+                     --post-install /exhaust/scripts/crmsh_after_install \
+                     --post-uninstall /exhaust/scripts/crmsh_after_remove \
+                     --deb-after-purge /exhaust/scripts/crmsh_after_remove \
+                     -p /tmp/deb -d cluster-libqb -d cluster-corosync \
+                     -d cluster-cluster-glue -d cluster-resource-agents \
+                     -d cluster-pacemaker &&
+                     cp /tmp/deb/* /exhaust/
+                  '"""
+
 def main():
     buildImage('./prereq/', 'prereq')
-    for command in libqbCommand, corosyncCommand, cglueCommand, ragentsCommand, pacemakerCommand:
+    for command in libqbCommand, corosyncCommand, cglueCommand, ragentsCommand, pacemakerCommand, crmCommand:
         runContainer(command)
 
 if __name__ == "__main__":
