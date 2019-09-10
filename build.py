@@ -92,7 +92,6 @@ pacemakerCommand = """sh -c 'wget --no-check-certificate https://github.com/Clus
                      make -j`grep -c ^processor /proc/cpuinfo` &&
                      mkdir -pv /tmp/build /tmp/deb && make install DESTDIR=/tmp/build &&
                      fpm -s dir -t deb -n cluster-pacemaker -v 1.1.21 -C /tmp/build \
-                     --before-remove /exhaust/scripts/pacemaker/prerm \
                      --after-install /exhaust/scripts/pacemaker/postinst \
                      -p /tmp/deb -d cluster-libqb -d cluster-corosync \
                      -d cluster-cluster-glue -d cluster-resource-agents &&
@@ -114,7 +113,7 @@ crmCommand = """sh -c 'wget --no-check-certificate https://github.com/ClusterLab
                      mkdir -pv /tmp/build /tmp/deb && make install DESTDIR=/tmp/build &&
                      fpm -s dir -t deb -n cluster-crmsh -v 2.1.9 -C /tmp/build \
                      --after-install /exhaust/scripts/crmsh/postinst \
-                     --after-uninstall /exhaust/scripts/crmsh/postrm \
+                     --after-remove /exhaust/scripts/crmsh/postrm \
                      --deb-after-purge /exhaust/scripts/crmsh/postrm \
                      -p /tmp/deb -d cluster-libqb -d cluster-corosync \
                      -d cluster-cluster-glue -d cluster-resource-agents \
