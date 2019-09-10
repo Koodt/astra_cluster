@@ -9,13 +9,15 @@ if [ "$1" = "configure" ]; then
 
 	# Touch an empty file so the log dir stays around after package removal
 	# so logrotate doesn't choke
+	mkdir -pv /var/log/corosync/
 	touch /var/log/corosync/.empty
 fi
 
 # Automatically added by dh_installinit
 if [ -x "/etc/init.d/corosync" ]; then
+	cp /etc/corosync/corosync.conf.example /etc/corosync/corosync.conf
+	mkdir -pv /var/lock/subsys/
 	update-rc.d corosync defaults 19 1 >/dev/null
 	invoke-rc.d corosync start || exit $?
 fi
 # End automatically added section
-
