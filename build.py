@@ -31,7 +31,13 @@ corosyncCommand = """sh -c 'wget --no-check-certificate https://github.com/coros
                      --localstatedir=/var &&
                      make -j`grep -c ^processor /proc/cpuinfo` &&
                      mkdir -pv /tmp/build /tmp/deb && make install DESTDIR=/tmp/build &&
-                     fpm -s dir -t deb -n cluster-corosync -v 2.4.5 -C /tmp/build -p /tmp/deb -d cluster-libqb &&
+                     fpm -s dir -t deb -n cluster-corosync -v 2.4.5 -C /tmp/build \
+                     --before-install /exhaust/scripts/corosync/preinst \
+                     --before-remove /exhaust/scripts/corosync/prerm \
+                     --after-install /exhaust/scripts/corosync/postinst \
+                     --after-remove /exhaust/scripts/corosync/postrm \
+                     --deb-after-purge /exhaust/scripts/corosync/postrm \
+                     -p /tmp/deb -d cluster-libqb -d libnss3 &&
                      cp /tmp/deb/* /exhaust/
                   '"""
 
@@ -48,7 +54,8 @@ cglueCommand = """sh -c 'wget --no-check-certificate https://github.com/ClusterL
                      --with-ocf-root=/opt/cluster/lib/ocf &&
                      make -j`grep -c ^processor /proc/cpuinfo` &&
                      mkdir -pv /tmp/build /tmp/deb && make install DESTDIR=/tmp/build &&
-                     fpm -s dir -t deb -n cluster-cluster-glue -v 1.0.12 -C /tmp/build -p /tmp/deb -d cluster-libqb -d cluster-corosync &&
+                     fpm -s dir -t deb -n cluster-cluster-glue -v 1.0.12 -C /tmp/build \
+                     -p /tmp/deb -d cluster-libqb -d cluster-corosync &&
                      cp /tmp/deb/* /exhaust/
                   '"""
 
@@ -64,7 +71,8 @@ ragentsCommand = """sh -c 'wget --no-check-certificate https://github.com/Cluste
                      --with-ocf-root=/opt/cluster/lib/ocf &&
                      make -j`grep -c ^processor /proc/cpuinfo` &&
                      mkdir -pv /tmp/build /tmp/deb && make install DESTDIR=/tmp/build &&
-                     fpm -s dir -t deb -n cluster-resource-agents -v 3.9.7 -C /tmp/build -p /tmp/deb -d cluster-libqb -d cluster-corosync -d cluster-cluster-glue &&
+                     fpm -s dir -t deb -n cluster-resource-agents -v 3.9.7 -C /tmp/build \
+                     -p /tmp/deb -d cluster-libqb -d cluster-corosync -d cluster-cluster-glue &&
                      cp /tmp/deb/* /exhaust/
                   '"""
 
@@ -83,8 +91,11 @@ pacemakerCommand = """sh -c 'wget --no-check-certificate https://github.com/Clus
                      --localstatedir=/var &&
                      make -j`grep -c ^processor /proc/cpuinfo` &&
                      mkdir -pv /tmp/build /tmp/deb && make install DESTDIR=/tmp/build &&
-                     fpm -s dir -t deb -n cluster-pacemaker -v 1.1.21 -C /tmp/build -p /tmp/deb -d cluster-libqb \
-                     -d cluster-corosync -d cluster-cluster-glue -d cluster-resource-agents &&
+                     fpm -s dir -t deb -n cluster-pacemaker -v 1.1.21 -C /tmp/build \
+                     --before-remove /exhaust/scripts/pacemaker/prerm \
+                     --after-install /exhaust/scripts/pacemaker/postinst \
+                     -p /tmp/deb -d cluster-libqb -d cluster-corosync \
+                     -d cluster-cluster-glue -d cluster-resource-agents &&
                      cp /tmp/deb/* /exhaust/
                   '"""
 
@@ -102,9 +113,9 @@ crmCommand = """sh -c 'wget --no-check-certificate https://github.com/ClusterLab
                      make -j`grep -c ^processor /proc/cpuinfo` &&
                      mkdir -pv /tmp/build /tmp/deb && make install DESTDIR=/tmp/build &&
                      fpm -s dir -t deb -n cluster-crmsh -v 2.1.9 -C /tmp/build \
-                     --post-install /exhaust/scripts/crmsh_after_install \
-                     --post-uninstall /exhaust/scripts/crmsh_after_remove \
-                     --deb-after-purge /exhaust/scripts/crmsh_after_remove \
+                     --after-install /exhaust/scripts/crmsh/postinst \
+                     --after-uninstall /exhaust/scripts/crmsh/postrm \
+                     --deb-after-purge /exhaust/scripts/crmsh/postrm \
                      -p /tmp/deb -d cluster-libqb -d cluster-corosync \
                      -d cluster-cluster-glue -d cluster-resource-agents \
                      -d cluster-pacemaker -d python-lxml &&
@@ -113,9 +124,9 @@ crmCommand = """sh -c 'wget --no-check-certificate https://github.com/ClusterLab
 
 def main():
     buildImage('./prereq/', 'prereq')
-    #for command in crmCommand:
-        #runContainer(command)
-    runContainer(crmCommand)
+    for command in libqbCommand, corosyncCommand, cglueCommand, ragentsCommand, pacemakerCommand, crmCommand:
+        runContainer(command)
+    #runContainer(crmCommand)
 
 if __name__ == "__main__":
     client = docker.from_env()
