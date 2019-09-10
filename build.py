@@ -43,7 +43,8 @@ cglueCommand = """sh -c 'wget --no-check-certificate https://github.com/ClusterL
                      --bindir=/opt/cluster/bin \
                      --libdir=/opt/cluster/lib \
                      --sysconfdir=/etc \
-                     --localstatedir=/var &&
+                     --localstatedir=/var \
+                     --with-ocf-root=/opt/cluster/lib/ocf &&
                      make -j`grep -c ^processor /proc/cpuinfo` &&
                      mkdir -pv /tmp/build /tmp/deb && make install DESTDIR=/tmp/build &&
                      fpm -s dir -t deb -n cluster-cluster-glue -v 1.0.12 -C /tmp/build -p /tmp/deb -d cluster-libqb -d cluster-corosync &&
@@ -64,7 +65,24 @@ ragentsCommand = """sh -c 'wget --no-check-certificate https://github.com/Cluste
                      --with-ocf-root=/opt/cluster/lib/ocf &&
                      make -j`grep -c ^processor /proc/cpuinfo` &&
                      mkdir -pv /tmp/build /tmp/deb && make install DESTDIR=/tmp/build &&
-                     fpm -s dir -t deb -n cluster-resource-agents -v 3.9.7 -C /tmp/build -p /tmp/deb -d cluster-libqb -d cluster-corosync cluster-cluster-glue &&
+                     fpm -s dir -t deb -n cluster-resource-agents -v 3.9.7 -C /tmp/build -p /tmp/deb -d cluster-libqb -d cluster-corosync -d cluster-cluster-glue &&
+                     cp /tmp/deb/* /exhaust/
+                  '"""
+
+pacemakerCommand = """sh -c 'wget --no-check-certificate https://github.com/ClusterLabs/pacemaker/archive/Pacemaker-1.1.21.tar.gz &&
+                     tar zxvf Pacemaker-1.1.21.tar.gz && cd /tmp/pacemaker-Pacemaker-1.1.21 &&
+                     dpkg -i /exhaust/* && ./autogen.sh &&
+                     OCF_ROOT_DIR="/opt/cluster/lib/ocf" OCF_RA_DIR="/opt/cluster/lib/resource.d" PATH="/opt/cluster/bin:$PATH" \
+                     PKG_CONFIG_PATH="/opt/cluster/lib/pkgconfig" ./configure \
+                     --prefix=/opt/cluster \
+                     --bindir=/opt/cluster/bin \
+                     --libdir=/opt/cluster/lib \
+                     --sysconfdir=/etc \
+                     --localstatedir=/var \
+                     --with-ocf-root=/opt/cluster/lib/ocf &&
+                     make -j`grep -c ^processor /proc/cpuinfo` &&
+                     mkdir -pv /tmp/build /tmp/deb && make install DESTDIR=/tmp/build &&
+                     fpm -s dir -t deb -n cluster-resource-agents -v 3.9.7 -C /tmp/build -p /tmp/deb -d cluster-libqb -d cluster-corosync -d cluster-cluster-glue &&
                      cp /tmp/deb/* /exhaust/
                   '"""
 
