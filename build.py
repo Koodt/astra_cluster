@@ -107,14 +107,15 @@ crmCommand = """sh -c 'wget --no-check-certificate https://github.com/ClusterLab
                      --deb-after-purge /exhaust/scripts/crmsh_after_remove \
                      -p /tmp/deb -d cluster-libqb -d cluster-corosync \
                      -d cluster-cluster-glue -d cluster-resource-agents \
-                     -d cluster-pacemaker &&
+                     -d cluster-pacemaker -d python-lxml &&
                      cp /tmp/deb/* /exhaust/
                   '"""
 
 def main():
     buildImage('./prereq/', 'prereq')
-    for command in libqbCommand, corosyncCommand, cglueCommand, ragentsCommand, pacemakerCommand, crmCommand:
-        runContainer(command)
+    #for command in crmCommand:
+        #runContainer(command)
+    runContainer(crmCommand)
 
 if __name__ == "__main__":
     client = docker.from_env()
