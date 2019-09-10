@@ -31,7 +31,7 @@ corosyncCommand = """sh -c 'wget --no-check-certificate https://github.com/coros
                      --localstatedir=/var &&
                      make -j`grep -c ^processor /proc/cpuinfo` &&
                      mkdir -pv /tmp/build /tmp/deb && make install DESTDIR=/tmp/build &&
-                     fpm -s dir -t deb -n cluster-corosync -v 2.4.5 -C /tmp/build -p /tmp/deb -d cluster-libqb &&
+                     fpm -s dir -t deb -n cluster-corosync -v 2.4.5 -C /tmp/build -p /tmp/deb -d cluster-libqb -d libnss3 &&
                      cp /tmp/deb/* /exhaust/
                   '"""
 
